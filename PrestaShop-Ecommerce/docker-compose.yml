@@ -1,0 +1,73 @@
+version: '3.8'
+
+networks:
+  ecommerce-network:
+    name: ecommerce-network
+    driver: bridge
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-ecommerce
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: shop
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ecommerce-network
+    ports:
+      - "3306:3306"
+    restart: unless-stopped
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./backend
+    container_name: backend-ecommerce
+    depends_on:
+      - mysql
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/shop
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: rootpassword
+      KEYCLOAK_AUTH-SERVER-URL: http://keycloak-ecommerce:8080
+    ports:
+      - "8080:8080"
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # Angular Frontend (Development)
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend-ecommerce
+    depends_on:
+      - backend
+    ports:
+      - "4200:4200"
+    networks:
+      - ecommerce-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama-ecommerce
+    ports:
+      - "11434:11434" 
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+    environment:
+      OLLAMA_HOST: 0.0.0.0:11434   
+
+volumes:
+  mysql_data:
+  ollama_data:

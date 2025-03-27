@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  keycloak-ecommerce:
+    image: quay.io/keycloak/keycloak:20.0.3  
+    container_name: keycloak-ecommerce
+    hostname: keycloak
+    ports:
+      - "8180:8080"  
+    environment:
+      KEYCLOAK_ADMIN: admin                  
+      KEYCLOAK_ADMIN_PASSWORD: admin         
+      KC_DB: postgres                        
+      KC_DB_URL: jdbc:postgresql://db:5432/keycloak-ecommerce  
+      KC_DB_USERNAME: keycloak               
+      KC_DB_PASSWORD: password               
+      KC_HOSTNAME: localhost                 
+    depends_on:
+      - db                                   
+    command: ["start-dev"]
+    networks:
+      - ecommerce-network
+
+  db:
+    image: postgres:13                       
+    container_name: keycloak-ecommerce-db
+    environment:
+      POSTGRES_DB: keycloak-ecommerce                  
+      POSTGRES_USER: keycloak                
+      POSTGRES_PASSWORD: password            
+    volumes:
+      - keycloak-ecommerce-db-data:/var/lib/postgresql/data  
+    networks:
+      - ecommerce-network
+
+volumes:
+  keycloak-ecommerce-db-data:                          
+
+networks:
+  ecommerce-network:
+    external: true
