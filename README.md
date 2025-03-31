@@ -5,4 +5,4 @@
 ![Architettura](https://imgur.com/PWi8RDY.png)
 
 ### Demo
-[Guarda il video](https://drive.google.com/file/d/1F29Q-Ty0e-TwfVcurARm9APm-AVLFJ9b/view?usp=sharing)
+[Demo](https://vimeo.com/1071059823/3a17a75482)
